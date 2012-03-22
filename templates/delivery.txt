@@ -1,0 +1,1 @@
+Gracias por tu mensaje, descarga tu contenido desde este link: {{url}}

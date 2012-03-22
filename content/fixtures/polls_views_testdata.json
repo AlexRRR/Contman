@@ -1,0 +1,101 @@
+[
+    {
+        "pk": 1,
+        "model": "content.contenido",
+        "fields": {
+            "nombre": "Chrome Logo",
+            "fecha_creacion": "2011-12-22T21:40:31Z",
+            "keyword": "chrome"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "content.contenido",
+        "fields": {
+            "nombre": "Firefox Logo",
+            "fecha_creacion": "2011-12-22T21:41:11Z",
+            "keyword": "fox"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "content.contenido",
+        "fields": {
+            "nombre": "test",
+            "fecha_creacion": "2011-12-22T21:41:49Z",
+            "keyword": "test"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.estilo",
+        "fields": {
+            "estilo": "test"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.artista",
+        "fields": {
+            "estilo": [
+                1
+            ],
+            "artista": "test"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "content.ringtone",
+        "fields": {
+            "grupo": [
+                1
+            ],
+            "archivo": "uploads/hello.txt"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.categoria",
+        "fields": {
+            "categoria": "Logos"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.wallpaper",
+        "fields": {
+            "categoria": 1,
+            "archivo": "uploads/chrome.jpg"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "content.wallpaper",
+        "fields": {
+            "categoria": 1,
+            "archivo": "uploads/logo.jpg"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.sms",
+        "fields": {
+            "received": "2012-01-20",
+            "smsc": "CLARO",
+            "msg": "chrome",
+            "valid": true,
+            "fromnum": "1234",
+            "tonum": "444"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "content.dynpath",
+        "fields": {
+            "url_path": "682510915432557438",
+            "sms": 1,
+            "payload": 1,
+            "created": "2012-01-01"
+        }
+    }
+]
