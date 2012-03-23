@@ -37,16 +37,17 @@ class EntryViewTestCase(TestCase):
         for a in [1,2]:
             mx = mox.Mox()
             mx.StubOutWithMock(content.msgsender, 'post_si_message')
-            content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
+            content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
             mx.ReplayAll()
             self.client.get('/entry/', {'fromnum': '50240113163','tonum': '1650','smsc':'TIGO','msg': 'chrome'})
             mx.UnsetStubs()
+            mx.VerifyAll()
 
 
     def test_sms_entrance(self):
         """SMS correctly saved in DB from post and renders the correct template"""
         self.mox.StubOutWithMock(content.msgsender, 'post_si_message')
-        content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
+        content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
         self.mox.ReplayAll()
         resp = self.client.get('/entry/', {'fromnum': '50240113163',
                                     'tonum': '1650',
@@ -58,6 +59,7 @@ class EntryViewTestCase(TestCase):
         for template in resp.templates:
             templates_used.append(template.name)
         self.assertEquals(templates_used, self.reply_template)
+        self.mox.VerifyAll()
 
     def test_matching_keyword(self):
         """Matching keyword"""

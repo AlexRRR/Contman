@@ -31,7 +31,7 @@ Content-type: text/vnd.wap.si\r\n\r\n\
 
     return body
 
-def post_si_message(body,smsc):
+def post_si_message(body,smsc,shortcode):
     '''sends POST data to host:port at entry_path'''
     print kannel_settings.PPG_URL + ':' + kannel_settings.PPG_PORT
     h = httplib.HTTPConnection(kannel_settings.PPG_URL,kannel_settings.PPG_PORT)
@@ -39,12 +39,13 @@ def post_si_message(body,smsc):
     h.putheader('Content-Type', 'multipart/related; boundary=multipart-boundary; type="application/xml"')
     h.putheader('Content-Length',str(len(body)))
     h.putheader('X-Kannel-SMSC', smsc)
+    h.putheader('X-Kannel-From', shortcode)
     h.endheaders()
     h.send(body)
     response = h.getresponse()
     return response
 
-def send_wap_push(smsc,phone,url,text):
+def send_wap_push(smsc,phone,shortcode,url,text):
     '''calls body generation and posts to URL'''
     body = generate_si_body(smsc,phone,url,text)
-    return post_si_message(body,smsc);
+    return post_si_message(body,smsc,shortcode);

@@ -29,7 +29,7 @@ def sms_entrance(request):
     
     if sms.valid:
          d = create_dynpath(sms,content)
-         wap_push(sms.smsc,sms.fromnum,d.url_path,'Descarga tu contenido de este link')
+         wap_push(sms.smsc,sms.fromnum,sms.tonum,d.url_path,'Descarga tu contenido de este link')
          return render_to_response('delivery.txt',{'url':d.url_path})
     else:
         return HttpResponse("Invalid keyword")

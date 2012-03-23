@@ -11,6 +11,6 @@ def clear_old_links():
     Dynpath.objects.filter(created__lt=yesterday).delete()
 
 @task(name='tasks.send_wap_push')
-def wap_push(smsc,phone,url,text):
+def wap_push(smsc,phone,shortcode,url,text):
     '''Non-blocking wap push tas to Kannel's ppg''' 
-    send_wap_push(smsc,phone,url,text)
+    send_wap_push(smsc,phone,shortcode,url,text)
