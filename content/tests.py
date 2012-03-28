@@ -54,6 +54,7 @@ class EntryViewTestCase(TestCase):
                                     'smsc': 'TIGO', 
                                     'msg': 'chrome'})
         time.sleep(1)
+        self.assertTrue('http://example.com/content/' in resp.content)
         self.assertTrue(SMS.objects.all().filter(fromnum='50240113163').exists())
         templates_used = []
         for template in resp.templates:

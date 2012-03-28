@@ -43,7 +43,7 @@ class Wallpaper(Contenido):
 
 
 class SMS(models.Model):
-    received = models.DateField(auto_now=True)
+    received = models.DateTimeField(auto_now=True)
     fromnum = models.CharField(max_length=100)
     tonum = models.CharField(max_length=100)
     smsc = models.CharField(max_length=100)
@@ -51,7 +51,7 @@ class SMS(models.Model):
     valid = models.BooleanField(db_index=True)
 
 class Dynpath(models.Model):
-    created = models.DateField(auto_now=True)
+    created = models.DateTimeField(auto_now=True)
     url_path = models.CharField(max_length=100)
     payload = models.ForeignKey(Contenido)
     sms = models.ForeignKey(SMS)

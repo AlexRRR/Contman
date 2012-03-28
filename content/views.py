@@ -5,6 +5,8 @@ from content.models import Dynpath
 from django.http import HttpResponse
 from django.http import Http404
 from django.shortcuts import get_object_or_404,render_to_response
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from random import getrandbits
 from datetime import date,timedelta
 from content.tasks import wap_push
@@ -29,8 +31,9 @@ def sms_entrance(request):
     
     if sms.valid:
          d = create_dynpath(sms,content)
-         wap_push(sms.smsc,sms.fromnum,sms.tonum,d.url_path,'Descarga tu contenido de este link')
-         return render_to_response('delivery.txt',{'url':d.url_path})
+         link = 'http://%s%s' % (Site.objects.get_current().domain,reverse('content.views.tempurl', args=[d.url_path]))
+         wap_push(sms.smsc,sms.fromnum,sms.tonum,link,'Descarga tu contenido de este link')
+         return render_to_response('delivery.txt',{'url':link})
     else:
         return HttpResponse("Invalid keyword")
 
