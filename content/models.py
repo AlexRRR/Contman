@@ -12,6 +12,9 @@ class Contenido(models.Model):
 class Estilo(models.Model):
     estilo = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return self.estilo
+
 class Artista(models.Model):
     artista = models.CharField(max_length=100)
     estilo = models.ManyToManyField(Estilo) 
