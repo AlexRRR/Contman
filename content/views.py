@@ -12,6 +12,10 @@ from datetime import date,timedelta
 from content.tasks import wap_push
 import mimetypes
 import os
+import logging
+
+logger = logging.getLogger('to_file')
+
 def sms_entrance(request):
     try:
         sms = SMS()
@@ -19,12 +23,14 @@ def sms_entrance(request):
         sms.tonum = request.GET.__getitem__('tonum')
         sms.smsc = request.GET.__getitem__('smsc')
         sms.msg = request.GET.__getitem__('msg')
-
         content = keyword_matches(sms.msg)
         if content:
             sms.valid = True
+            logger.debug('Received a matching SMS: FROM: %s, TO: %s, SMSC: %s, MSG: %s' % (sms.fromnum, sms.tonum,sms.smsc,sms.msg))
         else:
             sms.valid = False
+            logger.debug('Received a unmatching SMS: FROM: %s, TO: %s, SMSC:%s , MSG:%s' % (sms.fromnum, sms.tonum,sms.smsc,sms.msg))
+
         sms.save()
     except KeyError:
         raise Http404
