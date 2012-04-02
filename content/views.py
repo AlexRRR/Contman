@@ -73,9 +73,10 @@ def tempurl(request,hash):
     p = get_object_or_404(Dynpath, url_path=hash,created__gt=yesterday)
     try:
         fname = str(p.payload.wallpaper.archivo)
-        logger.debug('Hash %s identifed as Wallpaper, presenting content' % (hash)')
+        logger.debug('Hash %s identifed as Wallpaper, presenting content' % (hash))
     except DoesNotExist:
         fname = str(p.payload.ringtone.archivo)
+        logger.debug('Hash %s identifed as Ringtone, presenting content' % (hash))
     
     fn = open(fname,'rb')
     response = HttpResponse(fn.read())
