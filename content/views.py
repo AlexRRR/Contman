@@ -65,10 +65,15 @@ def create_dynpath(sms,content):
     return d
 
 def tempurl(request,hash):
+    '''Receives a hash sent as part of the URL received from the view
+    checks agaings the DB that it exists and fetches the content
+    and presents it for download'''
+
     yesterday = date.today()-timedelta(days=1)
     p = get_object_or_404(Dynpath, url_path=hash,created__gt=yesterday)
     try:
         fname = str(p.payload.wallpaper.archivo)
+        logger.debug('Hash %s identifed as Wallpaper, presenting content' % (hash)')
     except DoesNotExist:
         fname = str(p.payload.ringtone.archivo)
     
