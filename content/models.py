@@ -5,7 +5,7 @@ from django.contrib.contenttypes import generic
 
 class Contenido(models.Model):
     nombre = models.CharField(max_length=100)
-    fecha_creacion = models.DateTimeField('fecha creacion')
+    fecha_creacion = models.DateTimeField('fecha creacion', auto_now_add = True )
     keyword = models.CharField(max_length=100) 
     
 
