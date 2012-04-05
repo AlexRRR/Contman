@@ -32,11 +32,19 @@ class WallpaperAdmin(AdminImageMixin,admin.ModelAdmin):
 class SMSAdmin(admin.ModelAdmin):
     list_display = ('format_date','smsc', 'fromnum', 'tonum', 'msg')
     date_hierarchy = 'received'
+    actions = None 
+    list_filter = ('smsc',)
+    list_per_page = 30
+    search_fields = ['fromnum','tonum','msg']
+
     def format_date(self, obj):
         return obj.received.strftime('%d-%m-%Y %H:%M:%S')
+    
     format_date.short_description = 'Received date'
     format_date.admin_order_field = 'received'
 
+    def has_add_permission(self, request):
+        return False
 
 admin.site.register(Ringtone)
 admin.site.register(Estilo)
