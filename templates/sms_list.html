@@ -1,0 +1,4 @@
+{% for sms in sms_list %}
+    {# Each "contact" is a Contact model object. #}
+    {{ sms.smsc|upper }}<br />
+{% endfor %}
