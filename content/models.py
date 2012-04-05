@@ -46,6 +46,10 @@ class Wallpaper(Contenido):
 
 
 class SMS(models.Model):
+
+    class Meta:
+        verbose_name_plural = "SMS"
+
     received = models.DateTimeField(auto_now=True)
     fromnum = models.CharField(max_length=100)
     tonum = models.CharField(max_length=100)

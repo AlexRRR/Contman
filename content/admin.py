@@ -1,4 +1,4 @@
-from content.models import Ringtone,Estilo,Artista,Categoria,Wallpaper,Contenido
+from content.models import Ringtone,Estilo,Artista,Categoria,Wallpaper,Contenido,SMS
 from django.contrib import admin
 from sorl.thumbnail.admin import AdminImageMixin
 from sorl.thumbnail import get_thumbnail
@@ -29,6 +29,13 @@ class WallpaperAdmin(AdminImageMixin,admin.ModelAdmin):
             return "No Image" 
     my_image_thumb.allow_tags = True
 
+class SMSAdmin(admin.ModelAdmin):
+    list_display = ('format_date','smsc', 'fromnum', 'tonum', 'msg')
+    date_hierarchy = 'received'
+    def format_date(self, obj):
+        return obj.received.strftime('%d-%m-%Y %H:%M:%S')
+    format_date.short_description = 'Received date'
+    format_date.admin_order_field = 'received'
 
 
 admin.site.register(Ringtone)
@@ -36,3 +43,4 @@ admin.site.register(Estilo)
 admin.site.register(Artista)
 admin.site.register(Categoria)
 admin.site.register(Wallpaper,WallpaperAdmin)
+admin.site.register(SMS,SMSAdmin)

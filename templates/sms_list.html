@@ -1,4 +1,34 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'man admin' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Contman administration' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+{% block coltype %}flex{% endblock %}
+{% block content %}
+<h1>Received SMS List</h1>
+<table> 
+    <thead>
+    <tr>
+        <th>Date received</th>
+        <th>SMSC</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Message</th>
+    </tr>
+    </thead>
 {% for sms in sms_list %}
-    {# Each "contact" is a Contact model object. #}
-    {{ sms.smsc|upper }}<br />
+{# Each "contact" is a Contact model object. #}
+<tr class="{% if forloop.counter|divisibleby:2 %}row1{% else %}row2{% endif %}">
+        <td>{{ sms.received|date:"d-m-Y h:i:s" }}</td>
+        <td>{{ sms.smsc }}</td>
+        <td>{{ sms.fromnum }}</td>
+        <td>{{ sms.tonum }}</td>
+        <td>{{ sms.msg }}</td>
 {% endfor %}
+</table>
+{% endblock %}
