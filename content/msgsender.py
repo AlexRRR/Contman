@@ -13,7 +13,7 @@ Content-type: application/xml\r\n\r\n\
 \"http://www.wapforum.org/DTD/pap_1.0.dtd\">\r\n\
 <pap>\r\n\
 <push-message push-id=\"%s\">\r\n\
-<address address-value=\"WAPPUSH=+%s/TYPE=PLMN@ppg.nokia.com\"/>\r\n\
+<address address-value=\"WAPPUSH=%s/TYPE=PLMN@ppg.nokia.com\"/>\r\n\
 <quality-of-service delivery-method=\"unconfirmed\" network=\"GSM\" bearer=\"SMS\"/>\
 </push-message>\r\n\
 </pap>\r\n\r\n\
