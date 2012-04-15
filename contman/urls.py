@@ -18,5 +18,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^entry/$', 'content.views.sms_entrance'),
     url(r'^content/(?P<hash>\w+)/$', 'content.views.tempurl'),
-    url(r'^reports/(?P<rtype>\w+)/$', 'reports.views.overview'),
+    url(r'^reports/(?P<rtype>\w+)/$', 'reports.views.show_log'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

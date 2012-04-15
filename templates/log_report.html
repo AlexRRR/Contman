@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'man admin' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Contman administration' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+{% block coltype %}flex{% endblock %}
+{% block content %}
+<h1>Received SMS List</h1>
+{% for log_entry in log_entries %}
+	<p>{{log_entry}}</p>
+{% endfor %}
+{% endblock %}
