@@ -2,6 +2,11 @@
 import uuid
 import httplib
 import kannel_settings
+import xml.dom.minidom as minidom
+import logging
+
+logger = logging.getLogger('to_file')
+
 
 def generate_si_body(smsc,phone,url,text):
     '''generates body of SI message'''
@@ -13,7 +18,7 @@ Content-type: application/xml\r\n\r\n\
 \"http://www.wapforum.org/DTD/pap_1.0.dtd\">\r\n\
 <pap>\r\n\
 <push-message push-id=\"%s\">\r\n\
-<address address-value=\"WAPPUSH=+%s/TYPE=PLMN@ppg.nokia.com\"/>\r\n\
+<address address-value=\"WAPPUSH=%s/TYPE=PLMN@ppg.nokia.com\"/>\r\n\
 <quality-of-service delivery-method=\"unconfirmed\" network=\"GSM\" bearer=\"SMS\"/>\
 </push-message>\r\n\
 </pap>\r\n\r\n\
@@ -43,9 +48,38 @@ def post_si_message(body,smsc,shortcode):
     h.endheaders()
     h.send(body)
     response = h.getresponse()
-    return response
+    return response.read()
 
 def send_wap_push(smsc,phone,shortcode,url,text):
     '''calls body generation and posts to URL'''
-    body = generate_si_body(smsc,phone,url,text)
-    return post_si_message(body,smsc,shortcode);
+    signed_phone = format_phone(phone)
+    body = generate_si_body(smsc,signed_phone,url,text)
+    ppg_response = post_si_message(body,smsc,shortcode)
+    code, desc = parse_pap_xml(ppg_response)
+    print code[0]
+    if code[0] == "1":
+        logger.info("PPG Response %s: %s" % (code,desc))
+    elif code[0] == "2":
+        logger.error("PPG Response %s: %s" % (code,desc))
+    else:
+        logger.warning("Unexpected PPG Response %s:%s" % (code,desc))
+
+
+def format_phone(phone):
+    if phone[0] != "+":
+        signed_phone = ("+%s" % phone)
+    else:
+        signed_phone = phone
+    return signed_phone
+
+def parse_pap_xml(xmlstring):
+    doc = minidom.parseString(xmlstring)
+    node = doc.documentElement
+    pap = doc.getElementsByTagName("pap")[0]
+    result = pap.getElementsByTagName("response-result")[0]
+    (code, desc) = (result.getAttribute('code'),result.getAttribute('desc'))
+    return (code,desc)
+
+    
+
+

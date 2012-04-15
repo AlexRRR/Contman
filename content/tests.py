@@ -28,16 +28,19 @@ class EntryViewTestCase(TestCase):
         delivery_template = 'delivery.txt'
         self.reply_template = [delivery_template]
         self.mox = mox.Mox()
+        self.accepted_pap = """<?xml version="1.0"?><!DOCTYPE pap PUBLIC "-//WAPFORUM//DTD PAP 1.0//EN" "http://www.wapforum.org/DTD/pap_1.0.dtd"><pap><push-response push-id="ea3735c6-c3e6-42c2-882e-42fc21d9714b" sender-name="T-HAE0006.svoice.net; WAP/1.3 (Kannel/svn-r4952)" reply-time="2012-04-13T09:28:44Z" sender-address="/wappush"><response-result code ="1001" desc="The request has been accepted for processing"></response-result></push-response></pap>"""
 
     def tearDown(self):
         self.mox.UnsetStubs()
 
 
     def insert_two_sample_sms(self):
+        accepted_pap = """<?xml version="1.0"?><!DOCTYPE pap PUBLIC "-//WAPFORUM//DTD PAP 1.0//EN" "http://www.wapforum.org/DTD/pap_1.0.dtd"><pap><push-response push-id="ea3735c6-c3e6-42c2-882e-42fc21d9714b" sender-name="T-HAE0006.svoice.net; WAP/1.3 (Kannel/svn-r4952)" reply-time="2012-04-13T09:28:44Z" sender-address="/wappush"><response-result code ="1001" desc="The request has been accepted for processing"></response-result></push-response></pap>"""
+
         for a in [1,2]:
             mx = mox.Mox()
             mx.StubOutWithMock(content.msgsender, 'post_si_message')
-            content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
+            content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn(accepted_pap)
             mx.ReplayAll()
             self.client.get('/entry/', {'fromnum': '50240113163','tonum': '1650','smsc':'TIGO','msg': 'chrome'})
             mx.UnsetStubs()
@@ -47,7 +50,7 @@ class EntryViewTestCase(TestCase):
     def test_sms_entrance(self):
         """SMS correctly saved in DB from post and renders the correct template"""
         self.mox.StubOutWithMock(content.msgsender, 'post_si_message')
-        content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn("hello world")
+        content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn(self.accepted_pap)
         self.mox.ReplayAll()
         resp = self.client.get('/entry/', {'fromnum': '50240113163',
                                     'tonum': '1650',
@@ -110,4 +113,13 @@ class EntryViewTestCase(TestCase):
         clear_old_links.delay()
         with self.assertRaises(ObjectDoesNotExist) as cm:
             Dynpath.objects.get(id=1)
+
+
+    def test_pap_parser(self):
+        """Correct responses from the PPG should be parsed"""
+        accepted_code = "1001"
+        accepted_msg = "The request has been accepted for processing"
+        (code, msg) = content.msgsender.parse_pap_xml(self.accepted_pap)
+        self.assertEquals(code, accepted_code)
+        self.assertEquals(msg, accepted_msg)
 
