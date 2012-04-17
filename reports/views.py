@@ -28,4 +28,8 @@ def tail(file_name,window=20):
 		size -= linesFound
 		bytes -= BUFSIZE
 		block -= 1
-	return ''.join(data).splitlines()[-window:]
+
+        log_lines = ''.join(data).splitlines()[-window-1:]
+        if log_lines[-1][-1] == "\n":
+            return log_lines
+        return log_lines[:-1]

@@ -10,8 +10,11 @@
 {% block nav-global %}{% endblock %}
 {% block coltype %}flex{% endblock %}
 {% block content %}
-<h1>Received SMS List</h1>
+<h1>Activity log</h1>
+<div class="module">
 {% for log_entry in log_entries %}
 	<p>{{log_entry}}</p>
 {% endfor %}
+</div>
+
 {% endblock %}
