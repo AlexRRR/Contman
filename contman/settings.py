@@ -168,8 +168,10 @@ LOGGING = {
         },
         'file': {
             'level' : 'DEBUG',
-            'class' : 'logging.FileHandler',
+            'class' : 'logging.handlers.RotatingFileHandler',
             'filename' : 'debug.log',
+            'maxBytes' : 1024*1024*5, 
+            'backupCount' : 10, 
             'formatter': 'std',
         }
     },
