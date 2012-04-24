@@ -43,7 +43,7 @@
  <div class="module">
      <table>
          <caption><a class="section">Reports</a></caption>
-         <tr><th scope="row"><a href="/reports/log/">System log</a></th><td/><td/><tr>
+         <tr><th scope="row"><a href="{% url reports.views.show_log 'log' %}">System log</a></th><td/><td/><tr>
         </table>
 </div>
 {% else %}
