@@ -38,7 +38,6 @@ Content-type: text/vnd.wap.si\r\n\r\n\
 
 def post_si_message(body,smsc,shortcode):
     '''sends POST data to host:port at entry_path'''
-    print kannel_settings.PPG_URL + ':' + kannel_settings.PPG_PORT
     h = httplib.HTTPConnection(kannel_settings.PPG_URL,kannel_settings.PPG_PORT)
     h.putrequest('POST',kannel_settings.PPG_ENTRY)
     h.putheader('Content-Type', 'multipart/related; boundary=multipart-boundary; type="application/xml"')
@@ -56,7 +55,6 @@ def send_wap_push(smsc,phone,shortcode,url,text):
     body = generate_si_body(smsc,signed_phone,url,text)
     ppg_response = post_si_message(body,smsc,shortcode)
     code, desc = parse_pap_xml(ppg_response)
-    print code[0]
     if code[0] == "1":
         logger.info("PPG Response %s: %s" % (code,desc))
     elif code[0] == "2":

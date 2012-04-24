@@ -1,5 +1,5 @@
 # Create your views here.
-from content.models import SMS
+from content.models import SMS,Wallpaper
 from content.models import Contenido
 from content.models import Dynpath
 from django.http import HttpResponse
@@ -7,6 +7,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404,render_to_response
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from random import getrandbits
 from datetime import date,timedelta
 from content.tasks import wap_push
@@ -70,13 +71,19 @@ def tempurl(request,hash):
     and presents it for download'''
 
     yesterday = date.today()-timedelta(days=1)
-    p = get_object_or_404(Dynpath, url_path=hash,created__gt=yesterday)
     try:
-        fname = str(p.payload.wallpaper.archivo)
-        logger.debug('Hash %s identifed as Wallpaper, presenting content' % (hash))
-    except DoesNotExist:
-        fname = str(p.payload.ringtone.archivo)
-        logger.debug('Hash %s identifed as Ringtone, presenting content' % (hash))
+        p = Dynpath.objects.get(url_path=hash,created__gt=yesterday)
+        try:
+            fname = str(p.payload.wallpaper.archivo)
+            logger.debug('Hash %s identifed as Wallpaper, presenting content' % (hash))
+        except Wallpaper.DoesNotExist:
+            try:
+                fname = str(p.payload.ringtone.archivo)
+                logger.debug('Hash %s identifed as Ringtone, presenting content' % (hash))
+            except Ringtone.DoesNotExist:
+                raise Http404
+    except Dynpath.DoesNotExist:
+        raise Http404
     
     fn = open(fname,'rb')
     response = HttpResponse(fn.read())

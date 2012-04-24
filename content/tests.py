@@ -21,30 +21,24 @@ class EntryViewTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.existing_keyword = "chrome"
+        self.existing_wallpaper = "chrome"
+        self.existing_ringtone = "ring"
         self.not_existing_keyword = "gugaguga"
         self.invalid_text = "Invalid keyword"
-        self.insert_two_sample_sms()
         delivery_template = 'delivery.txt'
         self.reply_template = [delivery_template]
         self.mox = mox.Mox()
+        self.renew_dates()
         self.accepted_pap = """<?xml version="1.0"?><!DOCTYPE pap PUBLIC "-//WAPFORUM//DTD PAP 1.0//EN" "http://www.wapforum.org/DTD/pap_1.0.dtd"><pap><push-response push-id="ea3735c6-c3e6-42c2-882e-42fc21d9714b" sender-name="T-HAE0006.svoice.net; WAP/1.3 (Kannel/svn-r4952)" reply-time="2012-04-13T09:28:44Z" sender-address="/wappush"><response-result code ="1001" desc="The request has been accepted for processing"></response-result></push-response></pap>"""
 
     def tearDown(self):
         self.mox.UnsetStubs()
 
 
-    def insert_two_sample_sms(self):
-        accepted_pap = """<?xml version="1.0"?><!DOCTYPE pap PUBLIC "-//WAPFORUM//DTD PAP 1.0//EN" "http://www.wapforum.org/DTD/pap_1.0.dtd"><pap><push-response push-id="ea3735c6-c3e6-42c2-882e-42fc21d9714b" sender-name="T-HAE0006.svoice.net; WAP/1.3 (Kannel/svn-r4952)" reply-time="2012-04-13T09:28:44Z" sender-address="/wappush"><response-result code ="1001" desc="The request has been accepted for processing"></response-result></push-response></pap>"""
-
-        for a in [1,2]:
-            mx = mox.Mox()
-            mx.StubOutWithMock(content.msgsender, 'post_si_message')
-            content.msgsender.post_si_message(mox.IgnoreArg(),mox.IgnoreArg(),mox.IgnoreArg()).AndReturn(accepted_pap)
-            mx.ReplayAll()
-            self.client.get('/entry/', {'fromnum': '50240113163','tonum': '1650','smsc':'TIGO','msg': 'chrome'})
-            mx.UnsetStubs()
-            mx.VerifyAll()
+    def renew_dates(self):
+        '''update the dates from all fixtures but the first, so we can test
+        expired and active Dynpaths'''
+        Dynpath.objects.filter(id__gt=1).update(created=date.today())
 
 
     def test_sms_entrance(self):
@@ -67,7 +61,7 @@ class EntryViewTestCase(TestCase):
 
     def test_matching_keyword(self):
         """Matching keyword"""
-        self.assertTrue(keyword_matches(self.existing_keyword))
+        self.assertTrue(keyword_matches(self.existing_wallpaper))
 
     def test_not_matching_keyword(self):
         """Not matching keyword"""
@@ -84,23 +78,33 @@ class EntryViewTestCase(TestCase):
 
     def test_dynamic_path_creation(self):
         """check dynamic path is correctly generated and stored in DB"""
-        content = Contenido.objects.get(keyword=self.existing_keyword)
-        sms = SMS.objects.get(id=1) 
+        content = Contenido.objects.get(keyword=self.existing_wallpaper)
+        sms = SMS.objects.get(msg=self.existing_wallpaper) 
         dyn_path = create_dynpath(sms,content)
         stored_dyn = Dynpath.objects.get(id=dyn_path.id)
         self.assertEqual(stored_dyn,dyn_path)
         self.assertTrue(stored_dyn.url_path)
         
-    def test_dynamic_path_access(self):
+    def test_dynamic_path_access_wallpaper(self):
         """dynamic url exists and generates expected content"""
-        content = Contenido.objects.get(keyword=self.existing_keyword)
-        sms = SMS.objects.get(id=1)
+        content = Contenido.objects.get(keyword=self.existing_wallpaper)
+        sms = SMS.objects.get(msg=self.existing_wallpaper)
         dyn_path = create_dynpath(sms,content)
         url = '/content/' + str(dyn_path.url_path) + "/"
         resp = self.client.get(url)
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.get('Content-Disposition'),"attachment; filename=chrome.jpg")
 
+
+    def test_dynamic_path_access_ringtone(self):
+        """dynamic url exists and generates expected content"""
+        content = Contenido.objects.get(keyword=self.existing_ringtone)
+        sms = SMS.objects.get(msg=self.existing_ringtone)
+        dyn_path = create_dynpath(sms,content)
+        url = '/content/' + str(dyn_path.url_path) + "/"
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.get('Content-Disposition'),"attachment; filename=hello.txt")
 
     def test_expired_link(self):
         """expired link must deliver a defined msg, not content (expired dynpath from fixture)"""
