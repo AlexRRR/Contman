@@ -2,10 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404,render_to_response
 from content.models import SMS
 from django.http import HttpResponse
+from contman.settings import LOG_FILE
 # Create your views here.
 
 def show_log(request,rtype):
-	log_data = tail('debug.log')
+	log_data = tail(LOG_FILE)
 
 	return render_to_response('log_report.html', {'log_entries':log_data}) 
 
