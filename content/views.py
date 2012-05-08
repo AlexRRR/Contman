@@ -81,8 +81,10 @@ def tempurl(request,hash):
                 fname = str(p.payload.ringtone.archivo)
                 logger.debug('Hash %s identifed as Ringtone, presenting content' % (hash))
             except Ringtone.DoesNotExist:
+                logger.error('Hash %s not identified, sending 404' % (hash))
                 raise Http404
     except Dynpath.DoesNotExist:
+        logger.error('Hash %s not matching or expired!' % (hash))
         raise Http404
     
     fn = open(fname,'rb')
