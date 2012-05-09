@@ -82,15 +82,14 @@ def fill_gaps(results,qtype,start_d,end_d):
     end_date_found = False
     start_date_found = False
     for result in stored_results:
-        if end_date in result:
+        if end_d in result['date_created']:
             end_date_found = True
-        if start_date in result:
+        if start_d in result['date_created']:
             start_date_found = True
     if not end_date_found:
         stored_results.append({'date_created': end_d, 'created_count': 0})
     if not start_date_found:
         stored_results.insert(0,{'date_created': start_d, 'created_count': 0})
-
     no_gap_results = []
     last_result = lambda:no_gap_results[-1]['date_created']
     for entry in stored_results:
@@ -100,6 +99,9 @@ def fill_gaps(results,qtype,start_d,end_d):
         else:
             if dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) == 1:
                 no_gap_results.append(entry)
+            elif dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) == 0:
+                no_gap_results.append(entry)
+                continue
             else:
                 while (dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) != 1):
                     next_d = next_date[qtype](last_result())
@@ -115,7 +117,7 @@ def report_by_date(start_d,end_d):
     results by day, also filling the gaps in and days with no results'''
     start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
     end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
-    query_results = SMS.objects.filter(received__gt=start_date).exclude(received__gt=end_date).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
+    query_results = SMS.objects.filter(received__gte=start_date).exclude(received__gt=end_date).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
     return fill_gaps(query_results,'by_day',start_d, end_d)
 
 
@@ -136,7 +138,7 @@ def report_by_month(start_d,end_d):
     start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
     end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
 
-    query_results = SMS.objects.filter(received__gt=start_date).exclude(received__gt=end_date).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
+    query_results = SMS.objects.filter(received__gte=start_date).exclude(received__gt=end_date).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
     results = remove_time(query_results)
 
     return fill_gaps(results,'by_month',start_d, end_d)
