@@ -75,8 +75,15 @@ def fill_gaps(results,qtype,start_d,end_d):
     dispatch={'by_day':to_georgian,'by_month':to_month_number}
     next_date={'by_day':next_day,'by_month':next_month} 
     stored_results = list(results)
-    end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
-    start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
+
+    #make sure all dates displayed for month report are uniform.
+    if qtype == 'by_day':
+        end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
+        start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
+    if qtype == 'by_month':
+        e = datetime.strptime(end_d,'%Y-%m-%d').date()
+        s = datetime.strptime(start_d,'%Y-%m-%d').date()
+        end_d = date(e.year, e.month, 1).strftime('%Y-%m-%d')
 
     #add start date and end date to list if no results, to make sure it is filled with 0s
     end_date_found = False
@@ -90,6 +97,7 @@ def fill_gaps(results,qtype,start_d,end_d):
         stored_results.append({'date_created': end_d, 'created_count': 0})
     if not start_date_found:
         stored_results.insert(0,{'date_created': start_d, 'created_count': 0})
+
     no_gap_results = []
     last_result = lambda:no_gap_results[-1]['date_created']
     for entry in stored_results:
@@ -117,7 +125,8 @@ def report_by_date(start_d,end_d):
     results by day, also filling the gaps in and days with no results'''
     start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
     end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
-    query_results = SMS.objects.filter(received__gte=start_date).exclude(received__gt=end_date).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
+    query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
+    pdb.set_trace()
     return fill_gaps(query_results,'by_day',start_d, end_d)
 
 
@@ -138,9 +147,9 @@ def report_by_month(start_d,end_d):
     start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
     end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
 
-    query_results = SMS.objects.filter(received__gte=start_date).exclude(received__gt=end_date).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
+    query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
     results = remove_time(query_results)
-
+    pdb.set_trace()
     return fill_gaps(results,'by_month',start_d, end_d)
 
     
