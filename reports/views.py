@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.db.models import Count
 from django.db import connections
-from django.shortcuts import get_object_or_404,render_to_response
+from django.shortcuts import get_object_or_404,render_to_response,render
+from django.template import RequestContext
 from content.models import SMS
 from django.http import HttpResponse
 from contman.settings import LOG_FILE
@@ -154,4 +155,4 @@ def report_by_month(start_d,end_d):
     
 def search(request):
     form = SearchForm()
-    return render_to_response('sms_report.html', {'form': form})
+    return render_to_response('sms_report.html', {'form': form},context_instance=RequestContext(request))
