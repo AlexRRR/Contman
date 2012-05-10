@@ -6,10 +6,11 @@ from content.models import SMS
 from django.http import HttpResponse
 from contman.settings import LOG_FILE
 from datetime import datetime,date
+from reports.forms import SearchForm
 import pdb
 # Create your views here.
 
-def show_log(request,rtype):
+def show_log(request):
 	log_data = tail(LOG_FILE)
 
 	return render_to_response('log_report.html', {'log_entries':log_data}) 
@@ -126,7 +127,6 @@ def report_by_date(start_d,end_d):
     start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
     end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
     query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
-    pdb.set_trace()
     return fill_gaps(query_results,'by_day',start_d, end_d)
 
 
@@ -149,7 +149,9 @@ def report_by_month(start_d,end_d):
 
     query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
     results = remove_time(query_results)
-    pdb.set_trace()
     return fill_gaps(results,'by_month',start_d, end_d)
 
     
+def search(request):
+    form = SearchForm()
+    return render_to_response('sms_report.html', {'form': form})
