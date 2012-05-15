@@ -2,6 +2,7 @@
 {% load i18n %}
 {% block extrahead %}
 <link type="text/css" href="{{ STATIC_URL }}css/ui-lightness/jquery-ui-1.8.20.custom.css" rel="stylesheet" />
+<link type="text/css" href="{{ STATIC_URL }}css/report-graph/graph-report.css" rel="stylesheet" />
  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.20.custom.min.js"></script>
 
@@ -25,11 +26,29 @@
 <h1>Activity log</h1>
 <div class="module">
     <form action="." method="POST">
+        {% csrf_token %}
         <table>
             {{ form.as_table }}
         </table> 
         <p><input type="submit" value="Submit"></p>
     </form>
 </div>
-
+<div id="report"> 
+    <h1>Results</h1>
+    <div id="textdata"> 
+    <table>
+        <th>Date</th><th>SMS Count</th>
+        {% for datapoint in fname %}
+        <tr>
+            {% for key, value in datapoint.items %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table> 
+    </div>
+    <div id="graphdata">
+        <p>Hello graph!</p>
+    </div>
+</div>
 {% endblock %}

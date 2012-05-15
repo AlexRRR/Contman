@@ -125,10 +125,10 @@ def fill_gaps(results,qtype,start_d,end_d):
 def report_by_date(start_d,end_d):
     '''Fetches the results from a specific set of dates, and groups
     results by day, also filling the gaps in and days with no results'''
-    start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
-    end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
-    query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
-    return fill_gaps(query_results,'by_day',start_d, end_d)
+    start_date = start_d.strftime('%Y-%m-%d')
+    end_date = end_d.strftime('%Y-%m-%d')
+    query_results = SMS.objects.filter(received__range=[start_d,end_d]).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
+    return fill_gaps(query_results,'by_day',start_date, end_date)
 
 
 def remove_time(datelist):
@@ -152,7 +152,14 @@ def report_by_month(start_d,end_d):
     results = remove_time(query_results)
     return fill_gaps(results,'by_month',start_d, end_d)
 
-    
+
+
 def search(request):
-    form = SearchForm()
-    return render_to_response('sms_report.html', {'form': form},context_instance=RequestContext(request))
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            results = report_by_date(form.cleaned_data['sdate'],form.cleaned_data['edate'])
+            return render(request,'sms_report.html', { 'fname': results })
+    else:
+        form = SearchForm()
+    return render(request,'sms_report.html', {'form': form})

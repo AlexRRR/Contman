@@ -1,0 +1,22 @@
+
+#report {
+    width:100%;
+    margin: 0px auto;
+}
+
+#textdata {
+    float:left;
+    width:50%;
+}
+
+#graphdata {
+    float:left;
+    width:50%;
+}
+
+#summary {
+    clear:both;
+    width:100%;
+}
+
+
