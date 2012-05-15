@@ -6,11 +6,46 @@
  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.20.custom.min.js"></script>
 
- <script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+<link rel="stylesheet" type="text/css" hrf="{{ STATIC_URL }}css/jqplot/jquery.jqplot.min.css" />
+<script>
      $(function() {
          $('.dateentry').datepicker({ dateFormat: "yy-mm-dd" });
        });
  </script>
+<script>
+    $(document).ready(function(){
+    var line1 = [ {% for datapoint in fname %}
+                        [
+                        {% for key, value in datapoint.items %}
+                                '{{ value }}',
+                        {% endfor %}
+                        ], 
+                {% endfor %}
+                ];
+
+  var plot1 = $.jqplot('graphdata', [line1], {
+    title:'Default Date Axis',
+    axes:{
+        xaxis:{
+                autoscale:true,
+                tickOptions:{
+                        angle: -30
+                },
+                renderer:$.jqplot.DateAxisRenderer,
+        },
+        yaxis: { autoscale:true, 
+                 tickOptions: {
+                     formatString: '%d'
+                 },
+                 tickInterval:1,
+            } 
+        },
+    series:[{lineWidth:2, }]
+});
+});
+</script>
 
 {% endblock %}
 
@@ -48,7 +83,6 @@
     </table> 
     </div>
     <div id="graphdata">
-        <p>Hello graph!</p>
     </div>
 </div>
 {% endblock %}
