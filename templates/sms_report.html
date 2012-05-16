@@ -8,6 +8,8 @@
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
 <link rel="stylesheet" type="text/css" hrf="{{ STATIC_URL }}css/jqplot/jquery.jqplot.min.css" />
 <script>
      $(function() {
@@ -26,14 +28,14 @@
                 ];
 
   var plot1 = $.jqplot('graphdata', [line1], {
-    title:'Default Date Axis',
+    title:'SMS Report',
     axes:{
         xaxis:{
-                autoscale:true,
-                tickOptions:{
-                        angle: -30
-                },
                 renderer:$.jqplot.DateAxisRenderer,
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                tickOptions: {
+                    angle: -30
+                }
         },
         yaxis: { autoscale:true, 
                  tickOptions: {
@@ -71,7 +73,7 @@
 <div id="report"> 
     <h1>Results</h1>
     <div id="textdata"> 
-    <table>
+    <table class="reportitem">
         <th>Date</th><th>SMS Count</th>
         {% for datapoint in fname %}
         <tr>
@@ -81,8 +83,10 @@
         </tr>
         {% endfor %}
     </table> 
-    </div>
+</div>
+    <div class="reportitem">
     <div id="graphdata">
     </div>
+    <div>
 </div>
 {% endblock %}

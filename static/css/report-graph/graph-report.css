@@ -7,12 +7,20 @@
 #textdata {
     float:left;
     width:50%;
+    margin: 0px auto 0px auto;
+    text-align: center;
 }
 
 #graphdata {
     float:left;
     width:50%;
+    margin: 0px auto;
+    text-align: center;
 }
+
+.reportitem {
+    margin: 0 auto;
+} 
 
 #summary {
     clear:both;
