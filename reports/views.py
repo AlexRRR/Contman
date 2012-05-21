@@ -43,12 +43,12 @@ def tail(file_name,window=20):
 
 
 def to_georgian(datestring):
-    '''converts a date string into a georgian integeer'''
+    '''converts a date string into a georgian integer'''
     georgian = datetime.strptime(datestring,'%Y-%m-%d').date().toordinal()
     return georgian
 
 def to_month_number(datestring):
-    '''converts a date string into a month number'''
+    '''converts a date string into a month integer'''
     if ' ' in datestring:
         datestring = datestring.split()[0]
     month = datetime.strptime(datestring,'%Y-%m-%d').date().month
@@ -74,20 +74,17 @@ def next_day(current_day):
 
 def fill_gaps(results,qtype,start_d,end_d):
     '''adds entries to list with 0es for dates where not data was found'''
-    dispatch={'by_day':to_georgian,'by_month':to_month_number}
+    to_date_integer={'by_day':to_georgian,'by_month':to_month_number}
     next_date={'by_day':next_day,'by_month':next_month} 
     stored_results = list(results)
+    end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
+    start_date = datetime.strptime(start_d,'%Y-%m-%d').date()     
 
-    #make sure all dates displayed for month report are uniform.
-    if qtype == 'by_day':
-        end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
-        start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
+    #make sure all dates displayed for month report start at first day of month.
     if qtype == 'by_month':
-        e = datetime.strptime(end_d,'%Y-%m-%d').date()
-        s = datetime.strptime(start_d,'%Y-%m-%d').date()
-        end_d = date(e.year, e.month, 1).strftime('%Y-%m-%d')
+        end_d = date(end_date.year, end_date.month, 1).strftime('%Y-%m-%d')
 
-    #add start date and end date to list if no results, to make sure it is filled with 0s
+    #add start date and end date to list if not in results already, to make sure it is filled with 0s
     end_date_found = False
     start_date_found = False
     for result in stored_results:
@@ -103,17 +100,21 @@ def fill_gaps(results,qtype,start_d,end_d):
     no_gap_results = []
     last_result = lambda:no_gap_results[-1]['date_created']
     for entry in stored_results:
+        date_delta = lambda:to_date_integer[qtype](entry['date_created']) - to_date_integer[qtype](last_result())
         if len(no_gap_results) == 0:
             no_gap_results.append(entry)
             continue
         else:
-            if dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) == 1:
+            #if consecutive
+            if date_delta() == 1:
                 no_gap_results.append(entry)
-            elif dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) == 0:
+            #if same date
+            elif date_delta() == 0:
                 no_gap_results.append(entry)
                 continue
             else:
-                while (dispatch[qtype](entry['date_created']) - dispatch[qtype](last_result()) != 1):
+                #while not consecutive
+                while (date_delta() != 1):
                     next_d = next_date[qtype](last_result())
                     next_empty_entry = {'date_created': next_d, 'created_count': 0}
                     no_gap_results.append(next_empty_entry)
@@ -145,12 +146,12 @@ def remove_time(datelist):
 
 
 def report_by_month(start_d,end_d):
-    start_date = datetime.strptime(start_d,'%Y-%m-%d').date()
-    end_date = datetime.strptime(end_d,'%Y-%m-%d').date()
+    start_date = start_d.strftime('%Y-%m-%d')
+    end_date = end_d.strftime('%Y-%m-%d')
 
     query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
     results = remove_time(query_results)
-    return fill_gaps(results,'by_month',start_d, end_d)
+    return fill_gaps(results,'by_month',start_date, end_date)
 
 
 
