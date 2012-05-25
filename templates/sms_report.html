@@ -62,12 +62,23 @@
 {% block content %}
 <h1>Activity log</h1>
 <div class="module">
+    {{ form.non_field_errors }}
     <form action="." method="POST">
         {% csrf_token %}
         <table>
-            {{ form.as_table }}
-        </table> 
-        <p><input type="submit" value="Submit"></p>
+            <tr>
+            {% for field in form %}
+                <td> 
+                    {{ field.errors }}
+                    <td>{{ field.label_tag }}</td><td>{{ field }}</td>
+                </td>
+            {% endfor %}
+            <td>
+                <p><input type="submit" value="Submit"></p>
+            </td>
+        </tr>
+
+    </table> 
     </form>
 </div>
 <div id="report"> 

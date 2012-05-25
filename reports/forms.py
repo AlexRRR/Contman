@@ -2,8 +2,8 @@ from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 
 class SearchForm(forms.Form):
-    sdate = forms.DateField(input_formats=['%Y-%m-%d'],required=True,widget=forms.DateInput(attrs={'class': 'dateentry',}))
-    edate = forms.DateField(input_formats=['%Y-%m-%d'],required=True,widget=forms.DateInput(attrs={'class': 'dateentry',}))
+    sdate = forms.DateField(label='Start date',input_formats=['%Y-%m-%d'],required=True,widget=forms.DateInput(attrs={'class': 'dateentry',}))
+    edate = forms.DateField(label='End date', input_formats=['%Y-%m-%d'],required=True,widget=forms.DateInput(attrs={'class': 'dateentry',}))
 
     def clean(self):
         cleaned_data = super(SearchForm, self).clean()

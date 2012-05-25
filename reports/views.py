@@ -150,6 +150,7 @@ def report_by_month(start_d,end_d):
     end_date = end_d.strftime('%Y-%m-%d')
 
     query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
+    pdb.set_trace()
     results = remove_time(query_results)
     return fill_gaps(results,'by_month',start_date, end_date)
 
@@ -160,7 +161,7 @@ def search(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             results = report_by_date(form.cleaned_data['sdate'],form.cleaned_data['edate'])
-            return render(request,'sms_report.html', { 'fname': results })
+            return render(request,'sms_report.html', { 'form': form,'fname': results })
     else:
         form = SearchForm()
     return render(request,'sms_report.html', {'form': form})
