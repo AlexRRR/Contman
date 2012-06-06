@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.db import connections
 from django.shortcuts import get_object_or_404,render_to_response,render
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 from content.models import SMS
 from django.http import HttpResponse
 from contman.settings import LOG_FILE
@@ -11,6 +12,7 @@ from reports.forms import SearchForm
 import pdb
 # Create your views here.
 
+@login_required(login_url='/admin/login/')
 def show_log(request):
 	log_data = tail(LOG_FILE)
 
@@ -155,7 +157,7 @@ def report_by_month(start_d,end_d):
     return fill_gaps(results,'by_month',start_date, end_date)
 
 
-
+@login_required(login_url='/admin/login/')
 def search(request):
     if request.method == 'POST':
         form = SearchForm(request.POST)
