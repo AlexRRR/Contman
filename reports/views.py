@@ -4,7 +4,7 @@ from django.db import connections
 from django.shortcuts import get_object_or_404,render_to_response,render
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from content.models import SMS
+from content.models import SMS,Dynpath
 from django.http import HttpResponse
 from contman.settings import LOG_FILE
 from datetime import datetime,date
@@ -130,7 +130,13 @@ def report_by_date(start_d,end_d):
     results by day, also filling the gaps in and days with no results'''
     start_date = start_d.strftime('%Y-%m-%d')
     end_date = end_d.strftime('%Y-%m-%d')
-    query_results = SMS.objects.filter(received__range=[start_d,end_d]).extra({'date_created' : "date(received)"}).values('date_created').annotate(created_count=Count('id'))
+    query_results = SMS.objects.filter(
+                    received__range=[start_d,end_d]
+                    ).extra(
+                        {'date_created' : "date(received)"}
+                    ).values(
+                        'date_created'
+                    ).annotate(created_count=Count('id'))
     return fill_gaps(query_results,'by_day',start_date, end_date)
 
 
@@ -151,8 +157,14 @@ def report_by_month(start_d,end_d):
     start_date = start_d.strftime('%Y-%m-%d')
     end_date = end_d.strftime('%Y-%m-%d')
 
-    query_results = SMS.objects.filter(received__range=[start_date,end_date]).extra(select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}).values('date_created').annotate(created_count=Count('received'))
-    pdb.set_trace()
+    query_results = SMS.objects.filter(
+                    received__range=[start_date,end_date]
+                    ).extra(
+                        select={'date_created': connections[SMS.objects.db].ops.date_trunc_sql('month', 'received')}
+                    ).values('date_created'
+                    ).annotate(
+                        created_count=Count('received')
+                    )
     results = remove_time(query_results)
     return fill_gaps(results,'by_month',start_date, end_date)
 
@@ -162,8 +174,24 @@ def search(request):
     if request.method == 'POST':
         form = SearchForm(request.POST)
         if form.is_valid():
-            results = report_by_date(form.cleaned_data['sdate'],form.cleaned_data['edate'])
-            return render(request,'sms_report.html', { 'form': form,'fname': results })
+            detailed_results = report_by_date(form.cleaned_data['sdate'],form.cleaned_data['edate'])
+            summary = report_by_category(form.cleaned_data['sdate'],form.cleaned_data['edate'])
+            return render(request,'sms_report.html', { 'form': form,'results': detailed_results, 'summary': summary })
     else:
         form = SearchForm()
     return render(request,'sms_report.html', {'form': form})
+
+def report_by_category(start_d,end_d):
+    """Returns a list of quantity of content requested in given time range
+    grouped by category"""
+    start_date = start_d.strftime('%Y-%m-%d')
+    end_date = end_d.strftime('%Y-%m-%d')
+    
+    query_results = Dynpath.objects.filter(
+                    created__range=[start_date,end_date]
+                    ).values('payload__content_type__name'
+                    ).annotate(hits=Count("payload")
+                    )
+    return query_results
+
+

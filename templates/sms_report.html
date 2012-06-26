@@ -86,18 +86,28 @@
     <div id="textdata"> 
     <table class="reportitem">
         <th>Date</th><th>SMS Count</th>
-        {% for datapoint in fname %}
+        {% for datapoint in results %}
         <tr>
             {% for key, value in datapoint.items %}
             <td>{{ value }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
+    </table>
+    <table class="reportitem">
+        <th>Content Type</th><th>hits</th> 
+        {% for ctype in summary %}
+        <tr>
+            {% for key, value in ctype.items %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
     </table> 
-</div>
-    <div class="reportitem">
-    <div id="graphdata">
     </div>
+    <div class="reportitem">
+        <div id="graphdata">
+        </div>
     <div>
 </div>
 {% endblock %}

@@ -7,7 +7,7 @@ class Contenido(models.Model):
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateTimeField('fecha creacion', auto_now_add = True )
     keyword = models.CharField(max_length=100) 
-    
+    content_type = models.ForeignKey("contenttypes.ContentType") 
 
 class Estilo(models.Model):
     estilo = models.CharField(max_length=100)
