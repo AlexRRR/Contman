@@ -3,13 +3,14 @@
 {% block extrahead %}
 <link type="text/css" href="{{ STATIC_URL }}css/ui-lightness/jquery-ui-1.8.20.custom.css" rel="stylesheet" />
 <link type="text/css" href="{{ STATIC_URL }}css/report-graph/graph-report.css" rel="stylesheet" />
- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
- <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.20.custom.min.js"></script>
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.20.custom.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.cursor.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.highlighter.min.js"></script>
 <link rel="stylesheet" type="text/css" hrf="{{ STATIC_URL }}css/jqplot/jquery.jqplot.min.css" />
 <script>
      $(function() {
@@ -18,7 +19,7 @@
  </script>
 <script>
     $(document).ready(function(){
-    var line1 = [ {% for datapoint in fname %}
+    var line1 = [ {% for datapoint in results %}
                         [
                         {% for key, value in datapoint.items %}
                                 '{{ value }}',
@@ -31,8 +32,8 @@
     title:'SMS Report',
     axes:{
         xaxis:{
-                renderer:$.jqplot.DateAxisRenderer,
-                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+            renderer:$.jqplot.DateAxisRenderer,
+            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                 tickOptions: {
                     angle: -30
                 }
@@ -44,8 +45,15 @@
                  tickInterval:1,
             } 
         },
+        highlighter: {
+            show: true,
+            sizeAdjust: 7.5
+        },
+        cursor: {
+            show: false,
+        },
     series:[{lineWidth:2, }]
-});
+    });
 });
 </script>
 
