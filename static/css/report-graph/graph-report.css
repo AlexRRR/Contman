@@ -11,6 +11,13 @@
     text-align: center;
 }
 
+#contentgraph {
+    float:left;
+    width:50%;
+    margin: 0px auto;
+    text-align: center;
+}
+
 #graphdata {
     float:left;
     width:50%;

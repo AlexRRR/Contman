@@ -11,6 +11,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.cursor.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.highlighter.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/plugins/jqplot.pieRenderer.min.js"></script
 <link rel="stylesheet" type="text/css" hrf="{{ STATIC_URL }}css/jqplot/jquery.jqplot.min.css" />
 <script>
      $(function() {
@@ -19,7 +20,16 @@
  </script>
 <script>
     $(document).ready(function(){
-    var line1 = [ {% for datapoint in results %}
+
+    var smsdata = [ {% for datapoint in results %}
+                        [
+                        {% for key, value in datapoint.items %}
+                                '{{ value }}',
+                        {% endfor %}
+                        ], 
+                {% endfor %}
+                ];
+    var contentdata = [ {% for datapoint in summary %}
                         [
                         {% for key, value in datapoint.items %}
                                 '{{ value }}',
@@ -28,33 +38,44 @@
                 {% endfor %}
                 ];
 
-  var plot1 = $.jqplot('graphdata', [line1], {
-    title:'SMS Report',
-    axes:{
-        xaxis:{
-            renderer:$.jqplot.DateAxisRenderer,
-            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-                tickOptions: {
-                    angle: -30
-                }
-        },
-        yaxis: { autoscale:true, 
-                 tickOptions: {
-                     formatString: '%d'
-                 },
-                 tickInterval:1,
-            } 
-        },
-        highlighter: {
-            show: true,
-            sizeAdjust: 7.5
-        },
-        cursor: {
-            show: false,
-        },
-    series:[{lineWidth:2, }]
-    });
-});
+    var content_pie = $.jqplot('contentgraph', [contentdata], {
+                        seriesDefaults: {
+                            renderer: jQuery.jqplot.PieRenderer,
+                            rendererOptions: {
+                                showDataLabels: true
+                            }
+                        },
+                        legend: { show:true, location: 'nw' }
+                    });
+
+    var sms_plot = $.jqplot('graphdata', [smsdata], {
+                        title:'SMS Report',
+                        axes:{
+                            xaxis:{
+                                renderer:$.jqplot.DateAxisRenderer,
+                                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                                tickOptions: {
+                                angle: -30
+                                }
+                          },
+                            yaxis: { autoscale:true, 
+                                tickOptions: {
+                                formatString: '%d'
+                                },
+                                tickInterval:1,
+                            } 
+                        },
+                        highlighter: {
+                            show: true,
+                            sizeAdjust: 7.5
+                        },
+                        cursor: {
+                            show: false,
+                        },
+                        series:[{lineWidth:2, }]
+                    });
+                });
+
 </script>
 
 {% endblock %}
@@ -93,16 +114,6 @@
     <h1>Results</h1>
     <div id="textdata"> 
     <table class="reportitem">
-        <th>Date</th><th>SMS Count</th>
-        {% for datapoint in results %}
-        <tr>
-            {% for key, value in datapoint.items %}
-            <td>{{ value }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
-    <table class="reportitem">
         <th>Content Type</th><th>hits</th> 
         {% for ctype in summary %}
         <tr>
@@ -114,8 +125,10 @@
     </table> 
     </div>
     <div class="reportitem">
-        <div id="graphdata">
+        <div id="contentgraph">
         </div>
-    <div>
+        <div>
+    <div id="graphdata">
+    </div>
 </div>
 {% endblock %}
