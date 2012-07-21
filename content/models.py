@@ -7,7 +7,21 @@ class Contenido(models.Model):
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateTimeField('fecha creacion', auto_now_add = True )
     keyword = models.CharField(max_length=100) 
-    content_type = models.ForeignKey("contenttypes.ContentType") 
+    content_type = models.ForeignKey("contenttypes.ContentType",editable=False,null=True) 
+
+    def save(self):
+        if(not self.content_type):
+            self.content_type = ContentType.objects.get_for_model(self.__class__)
+        self.save_base()
+
+    def as_leaf_class(self):
+        content_type = self.content_type
+        model = content_type.model_class()
+        if(model == Contenido):
+            return self
+        return model.objects.get(id=self.id)
+
+
 
 class Estilo(models.Model):
     estilo = models.CharField(max_length=100)
