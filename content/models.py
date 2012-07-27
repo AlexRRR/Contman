@@ -29,12 +29,18 @@ class Estilo(models.Model):
     def __unicode__(self):
         return self.estilo
 
+    class Meta:
+        verbose_name = 'Style'
+
 class Artista(models.Model):
     artista = models.CharField(max_length=100)
     estilo = models.ManyToManyField(Estilo) 
 
     def __unicode__(self):
         return self.artista
+
+    class Meta:
+        verbose_name = 'Artist'
 
 class Ringtone(Contenido):
     grupo = models.ManyToManyField(Artista)
@@ -44,12 +50,16 @@ class Ringtone(Contenido):
         return self.nombre
 
 
+
 class Categoria(models.Model):
     categoria = models.CharField(max_length=100)
     
-
     def __unicode__(self):
         return self.categoria
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
 class Wallpaper(Contenido):
     categoria = models.ForeignKey(Categoria)
@@ -57,6 +67,7 @@ class Wallpaper(Contenido):
 
     def __unicode__(self):
         return self.nombre
+
 
 
 class SMS(models.Model):

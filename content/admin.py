@@ -5,6 +5,9 @@ from sorl.thumbnail import get_thumbnail
 from django.utils.safestring import mark_safe
 from django.contrib.contenttypes import generic
 from django import forms
+from djcelery.models import (TaskState, WorkerState,
+                         PeriodicTask, IntervalSchedule, CrontabSchedule)
+
 
 ADMIN_THUMBS_SIZE = '60x60'
 
@@ -52,3 +55,9 @@ admin.site.register(Artista)
 admin.site.register(Categoria)
 admin.site.register(Wallpaper,WallpaperAdmin)
 admin.site.register(SMS,SMSAdmin)
+admin.site.unregister(TaskState)
+admin.site.unregister(WorkerState)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(PeriodicTask)
+
